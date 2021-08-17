@@ -1,0 +1,7 @@
+.btn {
+    cursor: pointer;
+    padding: 5px 10px;
+    background: transparent;
+    color: teal;
+    border: 2px solid teal;
+}
