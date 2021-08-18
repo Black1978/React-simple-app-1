@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react'
+import PostFilter from './components/PostFilter'
 import PostForm from './components/PostForm'
 import PostList from './components/PostList'
-import MyInput from './components/UI/Inputs/MyInput'
-import MySelect from './components/UI/Select/MySelect'
 import './styles/App.css'
 
 function App() {
@@ -11,60 +10,37 @@ function App() {
         { id: 2, title: 'bbbbbbbbbbbbbbb', description: 'aaaaaaaaaaaaaaaaaaaaaa' },
         { id: 3, title: 'ccccccccccccccc', description: 'bbbbbbbbbbbbbbbbbbbbbb' },
     ])
-    const [selectedSort, setSelectedSort] = useState('')
-    const [searchQuary, setSearchQuary] = useState('')
+
+    const [filter, setFilter] = useState({ sort: '', query: '' })
+    console.log(filter.query)
+    console.log(filter.sort)
 
     const createPost = (newPost) => {
         setPostlist([...postList, { ...newPost }])
     }
 
     const sortedPosts = useMemo(() => {
-        console.log('Отработала функция ГутСортедПост')
-        if (selectedSort) {
-            return [...postList].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]))
+        if (filter.sort) {
+            return [...postList].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]))
         } else {
             return postList
         }
-    }, [selectedSort, postList])
+    }, [filter.sort, postList])
 
     const searchedAndSortedPosts = useMemo(() => {
-        return sortedPosts.filter((item) => item.title.includes(searchQuary) )
-    }, [sortedPosts, searchQuary ])
+        return sortedPosts.filter((item) => item.title.toLowerCase().includes(filter.query))
+    }, [sortedPosts, filter.query])
 
     const deletePost = (id) => {
         setPostlist(postList.filter((item) => item.id !== id))
-    }
-
-    const sortPosts = (sort) => {
-        setSelectedSort(sort)
     }
 
     return (
         <div className='app'>
             <PostForm create={createPost} />
             <hr style={{ margin: '15px 0' }} />
-            <div>
-                <MyInput
-                    placeholder='Search...'
-                    value={searchQuary}
-                    onChange={(e) => setSearchQuary(e.target.value)}
-                />
-                <MySelect
-                    value={selectedSort}
-                    onChange={sortPosts}
-                    defaultValue='Sort'
-                    options={[
-                        { value: 'title', name: 'Sort by title' },
-                        { value: 'description', name: 'Sort by description' },
-                    ]}
-                />
-            </div>
-
-            {postList.length ? (
-                <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
-            ) : (
-                <h1 style={{ textAlign: 'center' }}>There is no posts!</h1>
-            )}
+            <PostFilter filter={filter} setFilter={setFilter} />
+            <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
         </div>
     )
 }
