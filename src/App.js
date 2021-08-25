@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import PostService from './API/PostService'
 import PostFilter from './components/PostFilter'
 import PostForm from './components/PostForm'
 import PostList from './components/PostList'
@@ -8,19 +9,26 @@ import { usePosts } from './hooks/usePosts'
 import './styles/App.css'
 
 function App() {
-    const [postList, setPostlist] = useState([
-        { id: 1, title: 'aaaaaaaaaaaaaaa', description: 'cccccccccccccccccccccc' },
-        { id: 2, title: 'bbbbbbbbbbbbbbb', description: 'aaaaaaaaaaaaaaaaaaaaaa' },
-        { id: 3, title: 'ccccccccccccccc', description: 'bbbbbbbbbbbbbbbbbbbbbb' },
-    ])
-
+    const [postList, setPostlist] = useState([])
     const [filter, setFilter] = useState({ sort: '', query: '' })
     const [modal, setModal] = useState()
+    const [isPostLoading, setIsPostLoading] = useState(true)
     const searchedAndSortedPosts = usePosts(postList, filter.sort, filter.query)
+    useEffect(() => {
+        fetchPosts()
+    }, [])
 
     const createPost = (newPost) => {
         setPostlist([...postList, { ...newPost }])
         setModal(false)
+    }
+
+    async function fetchPosts() {
+        setTimeout(async () => {
+            const posts = await PostService.getAll()
+            setPostlist(posts)
+            setIsPostLoading(false)
+        }, 1000)
     }
 
     const deletePost = (id) => {
@@ -37,7 +45,11 @@ function App() {
             </MyModal>
             <hr style={{ margin: '15px 0' }} />
             <PostFilter filter={filter} setFilter={setFilter} />
-            <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
+            {isPostLoading ? (
+                <h1>The page is loading ........</h1>
+            ) : (
+                <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
+            )}
         </div>
     )
 }
