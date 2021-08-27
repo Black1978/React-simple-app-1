@@ -7,14 +7,18 @@ import MyButton from './components/UI/Buttons/MyButton'
 import Loader from './components/UI/Loader/Loader'
 import MyModal from './components/UI/MyModal/MyModal'
 import { usePosts } from './hooks/usePosts'
+import { useFetching } from './hooks/useFetching'
 import './styles/App.css'
 
 function App() {
     const [postList, setPostlist] = useState([])
     const [filter, setFilter] = useState({ sort: '', query: '' })
     const [modal, setModal] = useState()
-    const [isPostLoading, setIsPostLoading] = useState(true)
     const searchedAndSortedPosts = usePosts(postList, filter.sort, filter.query)
+    const [fetchPosts, isPostsLoading, postsError] = useFetching(async () => {
+        const posts = await PostService.getAll()
+        setPostlist(posts)
+    })
     useEffect(() => {
         fetchPosts()
     }, [])
@@ -23,15 +27,6 @@ function App() {
         setPostlist([...postList, { ...newPost }])
         setModal(false)
     }
-
-    async function fetchPosts() {
-        setTimeout(async () => {
-            const posts = await PostService.getAll()
-            setPostlist(posts)
-            setIsPostLoading(false)
-        }, 1000)
-    }
-
     const deletePost = (id) => {
         setPostlist(postList.filter((item) => item.id !== id))
     }
@@ -46,8 +41,18 @@ function App() {
             </MyModal>
             <hr style={{ margin: '15px 0' }} />
             <PostFilter filter={filter} setFilter={setFilter} />
-            {isPostLoading ? (
-                <div style={{display: 'flex', justifyContent: 'center', marginTop: 50, marginBottom: 50}}>
+            {postsError && (
+                <h1 style={{ display: 'flex', justifyContent: 'center' }}>{postsError}</h1>
+            )}
+            {isPostsLoading ? (
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        marginTop: 50,
+                        marginBottom: 50,
+                    }}
+                >
                     <Loader />
                 </div>
             ) : (
