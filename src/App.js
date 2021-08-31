@@ -9,19 +9,31 @@ import MyModal from './components/UI/MyModal/MyModal'
 import { usePosts } from './hooks/usePosts'
 import { useFetching } from './hooks/useFetching'
 import './styles/App.css'
+import { getPagesCount } from './utils/pages'
+import { usePagesNumbers } from './hooks/usePagesNumbers'
 
 function App() {
     const [postList, setPostlist] = useState([])
     const [filter, setFilter] = useState({ sort: '', query: '' })
     const [modal, setModal] = useState()
+
+    const [totalpages, setTotalPages] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [page, setPage] = useState(1)
+
     const searchedAndSortedPosts = usePosts(postList, filter.sort, filter.query)
+
     const [fetchPosts, isPostsLoading, postsError] = useFetching(async () => {
-        const posts = await PostService.getAll()
-        setPostlist(posts)
+        const responce = await PostService.getAll(limit, page)
+        setPostlist(responce.data)
+        const totalCount = responce.headers['x-total-count']
+        setTotalPages(getPagesCount(totalCount, limit))
     })
+    const pagesNumbers = usePagesNumbers(totalpages)
+
     useEffect(() => {
         fetchPosts()
-    }, [])
+    }, [page])
 
     const createPost = (newPost) => {
         setPostlist([...postList, { ...newPost }])
@@ -29,6 +41,9 @@ function App() {
     }
     const deletePost = (id) => {
         setPostlist(postList.filter((item) => item.id !== id))
+    }
+    const changePage = (page) => {
+        setPage(page)
     }
 
     return (
@@ -58,6 +73,17 @@ function App() {
             ) : (
                 <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
             )}
+            <div className='page-wrapper'>
+                {pagesNumbers.map((item) => (
+                    <span
+                        className={page !== item ? 'page-button' : 'page-button page-current'}
+                        key={item}
+                        onClick={() => changePage(item)}
+                    >
+                        {item}
+                    </span>
+                ))}
+            </div>
         </div>
     )
 }

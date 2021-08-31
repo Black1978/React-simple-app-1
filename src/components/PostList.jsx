@@ -9,7 +9,6 @@ const PostList = ({ postList, deletePost }) => {
             <h1 style={{ textAlign: 'center' }}>There is no posts!</h1>
         </div>)
     }
-
     return (
         <div>
             <TransitionGroup>
@@ -19,12 +18,9 @@ const PostList = ({ postList, deletePost }) => {
                         timeout={500}
                         classNames="post">
                         <PostItem postId={item.id} title={item.title} description={item.description} deletePost={deletePost}>
-
                         </PostItem>
-                        </CSSTransition>))}
+                    </CSSTransition>))}
             </TransitionGroup>
-
-
         </div>
     )
 }
