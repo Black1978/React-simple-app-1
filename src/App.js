@@ -11,6 +11,7 @@ import { useFetching } from './hooks/useFetching'
 import './styles/App.css'
 import { getPagesCount } from './utils/pages'
 import { usePagesNumbers } from './hooks/usePagesNumbers'
+import Pagination from './components/UI/pagination/Pagination'
 
 function App() {
     const [postList, setPostlist] = useState([])
@@ -44,7 +45,7 @@ function App() {
     }
     const changePage = (page) => {
         setPage(page)
-         fetchPosts(limit, page)
+        fetchPosts(limit, page)
     }
 
     return (
@@ -74,17 +75,7 @@ function App() {
             ) : (
                 <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
             )}
-            <div className='page-wrapper'>
-                {pagesNumbers.map((item) => (
-                    <span
-                        className={page !== item ? 'page-button' : 'page-button page-current'}
-                        key={item}
-                        onClick={() => changePage(item)}
-                    >
-                        {item}
-                    </span>
-                ))}
-            </div>
+            <Pagination pagesNumbers={pagesNumbers} changePage={changePage} page={page} />
         </div>
     )
 }
