@@ -23,7 +23,7 @@ function App() {
 
     const searchedAndSortedPosts = usePosts(postList, filter.sort, filter.query)
 
-    const [fetchPosts, isPostsLoading, postsError] = useFetching(async () => {
+    const [fetchPosts, isPostsLoading, postsError] = useFetching(async (limit, page) => {
         const responce = await PostService.getAll(limit, page)
         setPostlist(responce.data)
         const totalCount = responce.headers['x-total-count']
@@ -32,8 +32,8 @@ function App() {
     const pagesNumbers = usePagesNumbers(totalpages)
 
     useEffect(() => {
-        fetchPosts()
-    }, [page])
+        fetchPosts(limit, page)
+    }, [])
 
     const createPost = (newPost) => {
         setPostlist([...postList, { ...newPost }])
@@ -44,6 +44,7 @@ function App() {
     }
     const changePage = (page) => {
         setPage(page)
+         fetchPosts(limit, page)
     }
 
     return (
