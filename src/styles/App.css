@@ -63,3 +63,6 @@
 .navbar-links {
     margin-left: 10px;
 }
+.post__btn {
+    display: flex;
+}

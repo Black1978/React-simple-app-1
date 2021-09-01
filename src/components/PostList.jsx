@@ -17,8 +17,7 @@ const PostList = ({ postList, deletePost }) => {
                         key={item.id}
                         timeout={500}
                         classNames="post">
-                        <PostItem postId={item.id} title={item.title} description={item.description} deletePost={deletePost}>
-                        </PostItem>
+                        <PostItem postId={item.id} title={item.title} description={item.description} deletePost={deletePost}/>
                     </CSSTransition>))}
             </TransitionGroup>
         </div>

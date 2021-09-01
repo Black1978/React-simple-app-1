@@ -16,7 +16,7 @@ import Pagination from './../components/UI/pagination/Pagination'
 function Posts() {
     const [postList, setPostlist] = useState([])
     const [filter, setFilter] = useState({ sort: '', query: '' })
-    const [modal, setModal] = useState()
+    const [modal, setModal] = useState(null)
 
     const [totalpages, setTotalPages] = useState(0)
     const [limit, setLimit] = useState(10)
