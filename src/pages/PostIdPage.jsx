@@ -8,13 +8,11 @@ const PostIdPage = () => {
     const params = useParams()
     const [post, setPost] = useState({})
     const [comm, setComm] = useState([])
-    console.log(params.id);
 
     useEffect(() => {
         fetching(params.id)
         fetchingCom(params.id)
     }, [])
-
 
     const [fetching, isLoading, error] = useFetching(async (id) => {
         const responce = await PostService.getById(id)
@@ -25,20 +23,21 @@ const PostIdPage = () => {
         setComm(responce.data)
     })
 
-    console.log(comm);
-
     return (
         <div>
             <h1>You opened a post page with id = {params.id}</h1>
             {isLoading
                 ? <Loader />
-                : <div>{post.id} . {post.title}</div>
+                : <div style={{ border: '1px solid gray', padding: 5 }}>
+                    <div>{post.id}</div>
+                    <div>{post.title}</div>
+                </div>
             }
             <h2>These are comments to the post</h2>
             {isComLoading
                 ? <Loader />
                 : comm.map(item =>
-                    <div key={item.id} style={{marginTop: '10px', border: '2px solid black', padding: 5}}>
+                    <div key={item.id} style={{ marginTop: '10px', border: '1px solid black', padding: 5 }}>
                         <div>
                             {item.email}
                         </div>
