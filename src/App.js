@@ -7,16 +7,20 @@ import './styles/App.css'
 
 function App() {
     const [isAuth, setIsAuth] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     useEffect(() => {
         if(localStorage.getItem('auth')) {
             setIsAuth(true)
+            setIsLoading(false)
         }
         
     }, [])
+    console.log(isLoading);
     return (
         <AuthContext.Provider value={{
             isAuth,
-            setIsAuth
+            setIsAuth,
+            isLoading
         }}>
             <BrowserRouter>
                 <Navbar />
