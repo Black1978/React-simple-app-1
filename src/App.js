@@ -6,8 +6,11 @@ import { AuthContext } from './context'
 import './styles/App.css'
 
 function App() {
-    const [isAuth, setIsAuth] = useState(null)
+    const [isAuth, setIsAuth] = useState(false)
     useEffect(() => {
+        if(localStorage.getItem('auth')) {
+            setIsAuth(true)
+        }
         
     }, [])
     return (
