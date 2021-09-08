@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PostService from './../API/PostService'
 import PostFilter from './../components/PostFilter'
 import PostForm from './../components/PostForm'
@@ -23,10 +23,12 @@ function Posts() {
     const [page, setPage] = useState(1)
 
     const searchedAndSortedPosts = usePosts(postList, filter.sort, filter.query)
+    const lastElement = useRef()
+    const observer = useRef()
 
     const [fetchPosts, isPostsLoading, postsError] = useFetching(async (limit, page) => {
         const responce = await PostService.getAll(limit, page)
-        setPostlist(responce.data)
+        setPostlist([...postList, ...responce.data])
         const totalCount = responce.headers['x-total-count']
         setTotalPages(getPagesCount(totalCount, limit))
     })
@@ -34,7 +36,20 @@ function Posts() {
 
     useEffect(() => {
         fetchPosts(limit, page)
-    }, [])
+    }, [page])
+    useEffect(() => {
+        if(isPostsLoading) return
+        if(observer.current) observer.current.disconnect()
+        var callback = (arg) => {
+            if(arg[0].isIntersecting && page < totalpages) {
+                console.log(page);
+                setPage(page + 1)
+            }
+           
+        }
+        observer.current = new IntersectionObserver(callback)
+        observer.current.observe(lastElement.current)
+    }, [isPostsLoading])
 
     const createPost = (newPost) => {
         setPostlist([...postList, { ...newPost }])
@@ -45,7 +60,6 @@ function Posts() {
     }
     const changePage = (page) => {
         setPage(page)
-        fetchPosts(limit, page)
     }
 
     return (
@@ -61,7 +75,9 @@ function Posts() {
             {postsError && (
                 <h1 style={{ display: 'flex', justifyContent: 'center' }}>{postsError}</h1>
             )}
-            {isPostsLoading ? (
+            <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
+            <div style={{height: 20, background: 'red'}} ref={lastElement}></div>
+            {isPostsLoading && (
                 <div
                     style={{
                         display: 'flex',
@@ -72,8 +88,6 @@ function Posts() {
                 >
                     <Loader />
                 </div>
-            ) : (
-                <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
             )}
             <Pagination pagesNumbers={pagesNumbers} changePage={changePage} page={page} />
         </div>
