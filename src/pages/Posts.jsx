@@ -11,6 +11,7 @@ import { useFetching } from './../hooks/useFetching'
 
 import { getPagesCount } from './../utils/pages'
 import { usePagesNumbers } from './../hooks/usePagesNumbers'
+import { useObserver } from './../hooks/useObserver'
 import Pagination from './../components/UI/pagination/Pagination'
 
 function Posts() {
@@ -24,7 +25,6 @@ function Posts() {
 
     const searchedAndSortedPosts = usePosts(postList, filter.sort, filter.query)
     const lastElement = useRef()
-    const observer = useRef()
 
     const [fetchPosts, isPostsLoading, postsError] = useFetching(async (limit, page) => {
         const responce = await PostService.getAll(limit, page)
@@ -37,19 +37,9 @@ function Posts() {
     useEffect(() => {
         fetchPosts(limit, page)
     }, [page])
-    useEffect(() => {
-        if(isPostsLoading) return
-        if(observer.current) observer.current.disconnect()
-        var callback = (arg) => {
-            if(arg[0].isIntersecting && page < totalpages) {
-                console.log(page);
-                setPage(page + 1)
-            }
-           
-        }
-        observer.current = new IntersectionObserver(callback)
-        observer.current.observe(lastElement.current)
-    }, [isPostsLoading])
+    useObserver(lastElement, page < totalpages, isPostsLoading, () => setPage(page + 1))
+
+   
 
     const createPost = (newPost) => {
         setPostlist([...postList, { ...newPost }])
@@ -76,7 +66,7 @@ function Posts() {
                 <h1 style={{ display: 'flex', justifyContent: 'center' }}>{postsError}</h1>
             )}
             <PostList postList={searchedAndSortedPosts} deletePost={deletePost} />
-            <div style={{height: 20, background: 'red'}} ref={lastElement}></div>
+            <div style={{ height: 20, background: 'red' }} ref={lastElement}></div>
             {isPostsLoading && (
                 <div
                     style={{
