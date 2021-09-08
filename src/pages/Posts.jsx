@@ -6,6 +6,7 @@ import PostList from './../components/PostList'
 import MyButton from './../components/UI/Buttons/MyButton'
 import Loader from './../components/UI/Loader/Loader'
 import MyModal from './../components/UI/MyModal/MyModal'
+import MySelect from './../components/UI/Select/MySelect'
 import { usePosts } from './../hooks/usePosts'
 import { useFetching } from './../hooks/useFetching'
 
@@ -33,13 +34,15 @@ function Posts() {
         setTotalPages(getPagesCount(totalCount, limit))
     })
     const pagesNumbers = usePagesNumbers(totalpages)
+    console.log(limit);
 
     useEffect(() => {
         fetchPosts(limit, page)
-    }, [page])
+    }, [page, limit])
+
     useObserver(lastElement, page < totalpages, isPostsLoading, () => setPage(page + 1))
 
-   
+
 
     const createPost = (newPost) => {
         setPostlist([...postList, { ...newPost }])
@@ -62,6 +65,17 @@ function Posts() {
             </MyModal>
             <hr style={{ margin: '15px 0' }} />
             <PostFilter filter={filter} setFilter={setFilter} />
+            <MySelect
+                value={limit}
+                onChange={(value) => setLimit(value)}
+                defaultValue='Quantity of elements on the page'
+                options={[
+                    {value: 5, name: '5'},
+                    {value: 10, name: '10'},
+                    {value: 25, name: '25'},
+                    {value: -1, name: 'All elements'}
+                ]}
+            />
             {postsError && (
                 <h1 style={{ display: 'flex', justifyContent: 'center' }}>{postsError}</h1>
             )}
