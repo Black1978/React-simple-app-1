@@ -1,3 +1,3 @@
-# A simple React-app
+# A simple React-app.
 Number 1
 
