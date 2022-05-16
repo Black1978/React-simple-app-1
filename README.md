@@ -1,2 +1,2 @@
-# A simple React-app.
+# React application
 
